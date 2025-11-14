@@ -72,7 +72,7 @@ const loginController = async (req, resp) => {
         }
         //token
         const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "7d"
+            expiresIn: "7d",
         })
         user.password = undefined
         resp.status(200).send({

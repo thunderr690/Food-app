@@ -1,26 +1,46 @@
-const JWT = require('jsonwebtoken')
+const JWT = require("jsonwebtoken");
 
-module.exports = (req, resp, next) => {
+module.exports = (req, res, next) => {
     try {
-        // get token
-        const token = req.headers["authorization"].split(" ")[1]
-        JWT.verify(token, process.env.JWT_SECRET, (err, decode) => {
+        // FULL SAFE CHECK
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            return res.status(401).json({
+                success: false,
+                message: "Please provide Auth Token",
+            });
+        }
+
+        // Example header: "Bearer eyJhbGciOi..."
+        const token = authHeader.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: "Token is missing",
+            });
+        }
+
+        JWT.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
-                return resp.status(401).send({
+                return res.status(401).json({
                     success: false,
-                    message: "Un-Authorize User"
-                })
-            } else {
-                req.body.id = decode.id
-                next()
+                    message: "Unauthorized User",
+                });
             }
-        })
+
+            // STORE IN req.user — NOT req.body
+            req.user = decoded;
+
+            next();
+        });
     } catch (error) {
-        console.log(error);
-        resp.status(500).send({
+        console.log("Auth error:", error);
+        res.status(500).json({
             success: false,
-            message: "Please provide Auth Token",
-            error
-        })
+            message: "Auth Middleware Error",
+            error,
+        });
     }
-}
+};
