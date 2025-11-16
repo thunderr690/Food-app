@@ -28,4 +28,61 @@ const createResturantController = async (req, resp) => {
     }
 }
 
-module.exports = { createResturantController }
+//GET ALL RESTURANT 
+const getAllResturantController = async (req, resp) => {
+    try {
+        const resturant = await restaurantModel.find({})
+        if(!resturant){
+            return resp.status(404).send({
+                success:false,
+                message: "No Resturant Availible"
+            })
+        }
+        resp.status(200).send({
+            success: true,
+            totalCount:resturant.length,
+            resturant
+        })
+    } catch (error) {
+        console.log(error);
+        resp.status(500).send({
+            success: false,
+            message: "Error in Get All Resturant API",
+            error
+        })
+    }
+}
+// GET RESTURANT BY ID
+const getResturantByidController = async (req, resp) => {
+    try {
+        const resturantid = req.params.id
+        if(!resturantid){
+            return resp.status(404).send({
+                success: false,
+                message:"Please Provide Resturant ID"
+            })
+        }
+        //find Resturant
+        const resturant = await restaurantModel.findById(resturantid)
+        if (!resturant) {
+            return resp.status(404).send({
+                success: false,
+                message: "No resturant"
+            })
+        }
+        resp.status(200).send({
+            success: true,
+            resturant
+        })
+    } catch (error) {
+        console.log(error);
+        resp.status(500).send({
+            success: false,
+            message: "Error in Get Resturant by id API",
+            error
+        })
+        
+    }
+}
+
+module.exports = { createResturantController, getAllResturantController, getResturantByidController }
