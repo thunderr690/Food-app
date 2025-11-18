@@ -7,7 +7,6 @@ const router = express.Router()
 
 //routes
 
-
 // CREATE RESTURANT || POST
 router.post('/create', authmiddleware, createResturantController)
 
